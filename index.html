@@ -1,0 +1,152 @@
+<html>
+<head>
+	<script type="text/javascript">
+		var counter = (function() {
+			var _counter = 0;
+			return {
+				get: function() {return _counter;},
+				add: function(p) {_counter += arguments.length?p:1;}
+			}
+		})();
+
+		var ajax = (function() {
+			var xmlhttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
+			return {
+				open: function(method, path, callback) {
+					xmlhttp.onreadystatechange = function() {
+						if(this.readyState == 4 && this.status == 200) {
+							if(typeof callback == "function") {
+								callback.apply(null, [this]);
+							}
+						}
+					};
+					setTimeout(function() {
+						xmlhttp.open(method, path, true);
+						xmlhttp.send();
+					}, 1000);
+				},
+				get: function(path, callback) { this.open("get", path, callback);},
+				post: function(path, callback) { this.open("post", path, callback);}
+			}
+		})();
+
+		function loadContent(name) {
+			var content = document.getElementById("content");
+			content.innerHTML = "Loading...";
+			ajax.post(name, function(res) {
+			content.innerHTML = res.responseText;
+			var load = document.getElementById("onLoadContent");
+			if(load && load.value) {
+				eval(load.value);
+			}
+			});
+		}
+
+		function loadContent2(name) {
+			var content = document.getElementById("content2");
+			content.innerHTML = "Loading...";
+			ajax.post(name, function(res) {
+			content.innerHTML = res.responseText;
+			var load = document.getElementById("onLoadContent2");
+			if(load && load.value) {
+				eval(load.value);
+			}
+			});
+		}
+
+		function onLoadContent2() {
+			var username = document.getElementById("username");
+			username.innerText = account.getUser();
+			var setCurrentTime = function() {
+				var time = document.getElementById("timer");
+				if(time) {
+					var now = new Date();
+					time.innerText = now.getDate() + "/" + now.getMonth() + "/" + now.getFullYear() + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+				} else {
+					timer = clearInterval(timer);
+				}
+			}
+			
+			setCurrentTime();
+			timer = setInterval(function() {
+				setCurrentTime();
+			}, 1000);
+		}
+
+		var account = (function() {
+			var _username;
+			var _password;
+			return {
+				getUser: function() {return _username;},
+				login: function(username, password) {
+					_username = username;
+					_password = password;
+				},
+				logout: function() {
+					_username = "";
+					_password = "";
+				}
+			}
+		})();
+
+		function login() {
+			account.login(document.getElementById("username").value, document.getElementById("password").value);
+			loadContent('content2.html')
+		}
+
+		function logout() {
+			account.logout();
+			loadContent('content1.html')
+		}
+
+		window.onload = function() {
+			loadContent("content1.html");
+		};
+
+		var textFactory = (function() {
+			var _items = [];
+			_items[1] = {title: "Title1", remark: "Test text 1"};
+			_items[2] = {title: "Title2", remark: "Test text 555"};
+			var _maxId = _items.length;
+			return {
+				add: function(title, remark) {_items[++_maxId] = {title: title, remark: remark};},
+				list: function() {return _items;},
+				get: function(id) {return _items[id];}
+			}
+		})();
+
+		function onLoadContent3() {
+			var no = 1;
+			for(var id in textFactory.list()) {
+				var text = textFactory.get(id);
+
+				var no = document.createElement("span");
+				no.innerText = no++;
+				var title = document.createElement("span");
+				title.innerText = text.title;
+				var remark = document.createElement("span");
+				remark.innerText = text.remark;
+				var button = document.createElement("input");
+				button.type = "button";
+				button.value = "edit";
+				button.onclick = "editText('" + id + "')";
+
+				var div = document.createElement("div");
+				div.append(no);
+				div.append(".");
+				div.append(title);
+				div.append(":");
+				div.append(remark);
+				div.append(button);
+
+				document.getElementById("textList").append(div);
+			}
+		}
+
+	</script>
+</head>
+<body>
+	<div id="header"></div>
+	<div id="content">Content</div>
+</body>
+</html>

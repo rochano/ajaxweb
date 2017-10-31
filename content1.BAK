@@ -1,0 +1,8 @@
+<div>【ＬＯＧＩＮ】</div>
+<div>username : </div>
+<div><input type="text" id="username" /></div>
+<div>password : </div>
+<div><input type="password" id="password" /></div>
+<div>
+	<input type="button" value="login" onclick="login()"/>
+</div>

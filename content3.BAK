@@ -1,0 +1,6 @@
+<div>List text</div>
+<div id="textList"></div>
+<div>
+	<input type="button" value="add" onclick="loadContent2('content5.html')"/>	
+</div>
+<input type="hidden" id="onLoadContent" value="onLoadContent3()" />
